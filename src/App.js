@@ -5,13 +5,18 @@ import ProjectList from './components/ProjectList';
 import ProjectDetails from './components/ProjectDetails';
 import ProjectForm from './components/ProjectForm';
 import { auth, db } from './services/firebase';
-import { Modal } from '@mui/material';
 import Logout from './components/Logout';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import {Button} from '@mui/material';
 
 function App() {
   const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
-  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -34,24 +39,22 @@ function App() {
     return unsubscribe;
   }, []);
 
-  const handleOpenProjectForm = () => setIsProjectFormOpen(true);
-  const handleCloseProjectForm = () => setIsProjectFormOpen(false);
+  const handleOpenForm = () => {setOpenForm(true);};
+
+  const handleCloseForm = () => {setOpenForm(false);};
 
   return (
     <Router>
-      {user && <Logout/>}
+      {user && (
+        <>
+          <Logout />
+          <Button variant="contained" onClick={handleOpenForm} style={{ margin: '20px' }}>Añadir Proyecto</Button>
+      <ProjectForm open={openForm} onClose={handleCloseForm} /> </>
+      )}
       <Routes>
-        <Route path="/" element={user ? <ProjectList projects={projects} onAddNewProject={handleOpenProjectForm} /> : <Login />} />
+        <Route path="/" element={user ? <ProjectList projects={projects} /> : <Login />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
       </Routes>
-      <Modal
-        open={isProjectFormOpen}
-        onClose={handleCloseProjectForm}
-        aria-labelledby="project-form-modal-title"
-        aria-describedby="project-form-modal-description"
-      >
-        <ProjectForm onClose={handleCloseProjectForm} />
-      </Modal>
     </Router>
   );
 }

@@ -9,15 +9,13 @@ import {
   Paper,
   Button,
   Link,
-  Box
+  Box,
+  Link as RouterLink,
 } from '@mui/material';
 
-const ProjectList = ({ projects, onAddNewProject }) => {
+const ProjectList = ({ projects}) => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
-      <Button onClick={onAddNewProject} variant="contained" color="primary" sx={{ mb: 2, alignSelf: 'flex-end' }}>
-        Nuevo Proyecto
-      </Button>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}>
       <TableContainer component={Paper}>
         <h1>Mis Proyectos</h1>
         <Table>

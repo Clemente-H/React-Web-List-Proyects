@@ -1,61 +1,87 @@
-import React, { useState, useContext } from 'react'; // Asumiendo que usas un contexto para el usuario
+import React, { useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
 import { db } from '../services/firebase';
-import { Modal, Box, Container, TextField, Button, Typography } from '@mui/material';
-//import { UserContext } from './UserContext'; // Esto es hipotético, ajusta según cómo manejes el estado del usuario
-import { useUser } from './UserContext'; // Asegúrate de que la ruta sea correcta
+import { useUser } from './UserContext';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-};
-
-const ProjectForm = ({ open, handleClose }) => {
+const ProjectForm = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
     title: '',
     shortDescription: '',
     longDescription: '',
     link: '',
   });
-  //const { currentUser } = useContext(UserContext); // Asume que el ID del usuario se guarda aquí
   const { currentUser } = useUser();
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.title || !formData.shortDescription || !formData.longDescription || !formData.link) {
+      alert("Please fill all the fields.");
+      return;
+    }
     try {
       await db.collection('projects').add({
         ...formData,
-        userId: currentUser.uid, // Usa el ID del usuario actual
+        userId: currentUser.uid,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-      handleClose(); // Cierra el modal tras una adición exitosa
-      setFormData({ title: '', shortDescription: '', longDescription: '', link: '' }); // Restablece el formulario
+      onClose(); // Close the dialog on successful addition
+      setFormData({ title: '', shortDescription: '', longDescription: '', link: '' }); // Reset the form
     } catch (error) {
-      console.error('Error al crear el proyecto:', error);
+      console.error('Error creating project:', error);
     }
   };
 
   return (
-    <Modal open={open} onClose={handleClose} aria-labelledby="project-form-modal-title" aria-describedby="project-form-modal-description">
-      <Box sx={style}>
-        <Container maxWidth="sm">
-          <Typography id="project-form-modal-title" variant="h6" component="h2" gutterBottom>Nuevo Proyecto</Typography>
-          <form onSubmit={handleSubmit}>
-            {/* Campos del formulario */}
-          </form>
-        </Container>
-      </Box>
-    </Modal>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>New Project</DialogTitle>
+      <form onSubmit={handleSubmit}>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Título"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Descripción Corta"
+            name="shortDescription"
+            value={formData.shortDescription}
+            onChange={handleChange}
+            margin="normal"
+            multiline
+          />
+          <TextField
+            fullWidth
+            label="Descripción Larga"
+            name="longDescription"
+            value={formData.longDescription}
+            onChange={handleChange}
+            margin="normal"
+            multiline
+          />
+          <TextField
+            fullWidth
+            label="Link"
+            name="link"
+            value={formData.link}
+            onChange={handleChange}
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="submit">Create</Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 };
 
