@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../services/firebase';
-import '../styles/AttributeTable.css';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 
 const AttributeTable = ({ projectId }) => {
   const [attributes, setAttributes] = useState([]);
@@ -12,7 +12,7 @@ const AttributeTable = ({ projectId }) => {
         .doc(projectId)
         .collection('attributes')
         .get();
-      const attributesData = attributesCollection.docs.map((doc) => ({
+      const attributesData = attributesCollection.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
@@ -23,29 +23,29 @@ const AttributeTable = ({ projectId }) => {
   }, [projectId]);
 
   return (
-    <div className="attribute-table-container">
-      <h2>Atributos del Proyecto</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {attributes.map((attribute) => (
-            <tr key={attribute.id}>
-              <td>{attribute.name}</td>
-              <td>{attribute.description}</td>
-              <td>{attribute.date.toDate().toLocaleString()}</td>
-              <td>{attribute.completed ? 'Completado' : 'Pendiente'}</td>
-            </tr>
+    <TableContainer component={Paper}>
+      <Typography variant="h6" style={{ margin: '16px' }}>Atributos del Proyecto</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Nombre</TableCell>
+            <TableCell>Descripción</TableCell>
+            <TableCell>Fecha</TableCell>
+            <TableCell>Estado</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {attributes.map(attribute => (
+            <TableRow key={attribute.id}>
+              <TableCell>{attribute.name}</TableCell>
+              <TableCell>{attribute.description}</TableCell>
+              <TableCell>{attribute.date.toDate().toLocaleString()}</TableCell>
+              <TableCell>{attribute.completed ? 'Completado' : 'Pendiente'}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

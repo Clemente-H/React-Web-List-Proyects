@@ -1,6 +1,7 @@
 import React from 'react';
-import { auth } from '../services/firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { Button, Typography, Paper } from '@mui/material';
+import { auth } from '../services/firebase';
 import '../styles/Login.css';
 
 const Login = () => {
@@ -10,12 +11,12 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <h1>Iniciar sesión</h1>
-      <button className="login-button" onClick={signInWithGoogle}>
+    <Paper elevation={3} style={{ padding: '40px', maxWidth: '400px', margin: '100px auto' }}>
+      <Typography variant="h4" gutterBottom>Iniciar sesión</Typography>
+      <Button variant="contained" color="primary" onClick={signInWithGoogle}>
         Ingresar con Google
-      </button>
-    </div>
+      </Button>
+    </Paper>
   );
 };
 

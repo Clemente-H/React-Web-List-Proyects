@@ -1,15 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // Asumiendo que usas un contexto para el usuario
 import { db } from '../services/firebase';
-import '../styles/ProjectForm.css';
+import { Modal, Box, Container, TextField, Button, Typography } from '@mui/material';
+//import { UserContext } from './UserContext'; // Esto es hipotético, ajusta según cómo manejes el estado del usuario
+import { useUser } from './UserContext'; // Asegúrate de que la ruta sea correcta
 
-const ProjectForm = () => {
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+};
+
+const ProjectForm = ({ open, handleClose }) => {
   const [formData, setFormData] = useState({
     title: '',
     shortDescription: '',
     longDescription: '',
     link: '',
   });
-
+  //const { currentUser } = useContext(UserContext); // Asume que el ID del usuario se guarda aquí
+  const { currentUser } = useUser();
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -17,64 +32,30 @@ const ProjectForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const newProjectRef = await db.collection('projects').add({
+      await db.collection('projects').add({
         ...formData,
-        userId: 'userId', // Reemplaza con el ID del usuario actual
+        userId: currentUser.uid, // Usa el ID del usuario actual
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-      console.log('Proyecto creado con ID:', newProjectRef.id);
-      // Aquí puedes realizar acciones adicionales después de crear el proyecto
+      handleClose(); // Cierra el modal tras una adición exitosa
+      setFormData({ title: '', shortDescription: '', longDescription: '', link: '' }); // Restablece el formulario
     } catch (error) {
       console.error('Error al crear el proyecto:', error);
     }
   };
 
   return (
-    <div className="project-form-container">
-      <h1>Nuevo Proyecto</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="title">Título:</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="shortDescription">Descripción corta:</label>
-          <textarea
-            id="shortDescription"
-            name="shortDescription"
-            value={formData.shortDescription}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="longDescription">Descripción larga:</label>
-          <textarea
-            id="longDescription"
-            name="longDescription"
-            value={formData.longDescription}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="link">Link:</label>
-          <input
-            type="text"
-            id="link"
-            name="link"
-            value={formData.link}
-            onChange={handleChange}
-          />
-        </div>
-        <button type="submit">Crear Proyecto</button>
-      </form>
-    </div>
+    <Modal open={open} onClose={handleClose} aria-labelledby="project-form-modal-title" aria-describedby="project-form-modal-description">
+      <Box sx={style}>
+        <Container maxWidth="sm">
+          <Typography id="project-form-modal-title" variant="h6" component="h2" gutterBottom>Nuevo Proyecto</Typography>
+          <form onSubmit={handleSubmit}>
+            {/* Campos del formulario */}
+          </form>
+        </Container>
+      </Box>
+    </Modal>
   );
 };
 

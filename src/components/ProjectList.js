@@ -1,47 +1,61 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/ProjectList.css';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Link,
+  Box
+} from '@mui/material';
 
-const ProjectList = ({ projects }) => {
+const ProjectList = ({ projects, onAddNewProject }) => {
   return (
-    <div className="project-list-container">
-      <h1>Mis Proyectos</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Descripción</th>
-            <th>Link</th>
-            <th>Fecha de creación</th>
-            <th>Última modificación</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map((project) => (
-            <tr key={project.id}>
-              <td>{project.id}</td>
-              <td>
-                <Link to={`/projects/${project.id}`}>{project.title}</Link>
-              </td>
-              <td>{project.shortDescription}</td>
-              <td>
-                {project.link ? (
-                  <a href={project.link} target="_blank" rel="noopener noreferrer">
-                    Link
-                  </a>
-                ) : (
-                  '-'
-                )}
-              </td>
-              <td>{project.createdAt.toDate().toLocaleString()}</td>
-              <td>{project.updatedAt.toDate().toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <button>Nuevo Proyecto</button>
-    </div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
+      <Button onClick={onAddNewProject} variant="contained" color="primary" sx={{ mb: 2, alignSelf: 'flex-end' }}>
+        Nuevo Proyecto
+      </Button>
+      <TableContainer component={Paper}>
+        <h1>Mis Proyectos</h1>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Título</TableCell>
+              <TableCell>Descripción</TableCell>
+              <TableCell>Link</TableCell>
+              <TableCell>Fecha de creación</TableCell>
+              <TableCell>Última modificación</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {projects.map((project) => (
+              <TableRow key={project.id}>
+                <TableCell>{project.id}</TableCell>
+                <TableCell>
+                  <Link component={RouterLink} to={`/projects/${project.id}`}>
+                    {project.title}
+                  </Link>
+                </TableCell>
+                <TableCell>{project.shortDescription}</TableCell>
+                <TableCell>
+                  {project.link ? (
+                    <Link href={project.link} target="_blank" rel="noopener noreferrer">
+                      Link
+                    </Link>
+                  ) : '-'}
+                </TableCell>
+                <TableCell>{project.createdAt.toDate().toLocaleString()}</TableCell>
+                <TableCell>{project.updatedAt.toDate().toLocaleString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 

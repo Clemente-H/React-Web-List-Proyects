@@ -4,18 +4,19 @@ import Login from './components/Login';
 import ProjectList from './components/ProjectList';
 import ProjectDetails from './components/ProjectDetails';
 import ProjectForm from './components/ProjectForm';
-//import firebase from './services/firebase';
-import { auth, db } from './services/firebase'; // Cambiar esta línea
+import { auth, db } from './services/firebase';
+import { Modal } from '@mui/material';
+import Logout from './components/Logout';
+
 function App() {
   const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
 
   useEffect(() => {
-    // Inicializar Firebase y verificar si el usuario está autenticado
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
-        // Obtener los proyectos del usuario desde Firebase
         db.collection('projects').where('userId', '==', user.uid).get()
           .then((querySnapshot) => {
             const projectsData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -33,13 +34,24 @@ function App() {
     return unsubscribe;
   }, []);
 
+  const handleOpenProjectForm = () => setIsProjectFormOpen(true);
+  const handleCloseProjectForm = () => setIsProjectFormOpen(false);
+
   return (
     <Router>
+      {user && <Logout/>}
       <Routes>
-        <Route path="/" element={user ? <ProjectList projects={projects} /> : <Login />} />
+        <Route path="/" element={user ? <ProjectList projects={projects} onAddNewProject={handleOpenProjectForm} /> : <Login />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
-        <Route path="/new-project" element={<ProjectForm />} />
       </Routes>
+      <Modal
+        open={isProjectFormOpen}
+        onClose={handleCloseProjectForm}
+        aria-labelledby="project-form-modal-title"
+        aria-describedby="project-form-modal-description"
+      >
+        <ProjectForm onClose={handleCloseProjectForm} />
+      </Modal>
     </Router>
   );
 }
