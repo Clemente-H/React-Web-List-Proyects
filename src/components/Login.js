@@ -1,12 +1,12 @@
 import React from 'react';
 import { auth } from '../services/firebase';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import '../styles/Login.css';
-//import firebase from '../services/firebase';
 
 const Login = () => {
   const signInWithGoogle = () => {
-    const provider = new auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider);
   };
 
   return (
